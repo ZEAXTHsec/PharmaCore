@@ -3,168 +3,207 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>PharmaCore — D.Pharma Revision</title>
+  <title>PharmaCore — D.Pharma</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
+  <!-- NAV -->
   <nav id="navbar">
     <div id="nav-left">
-      <button id="back-btn" class="hidden" aria-label="Back">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      <button id="back-btn" class="nav-icon-btn hidden" aria-label="Back">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
       </button>
-      <span id="nav-title">
-        <span class="logo-dot"></span>PharmaCore
-      </span>
+      <div id="nav-brand">
+        <div class="brand-pill">Rx</div>
+        <span id="nav-title">PharmaCore</span>
+      </div>
     </div>
-    <button id="theme-toggle" aria-label="Toggle theme">
-      <svg id="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-      <svg id="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="hidden"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-    </button>
+    <div id="nav-right">
+      <span id="nav-context"></span>
+      <button id="theme-toggle" class="nav-icon-btn" aria-label="Toggle theme">
+        <svg id="icon-moon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg id="icon-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="hidden"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
+    </div>
   </nav>
 
   <!-- HOME -->
   <section id="screen-home" class="screen active">
     <div class="home-hero">
-      <div class="hero-badge">D.Pharma · 4 Year Papers</div>
-      <h1>PharmaCore</h1>
-      <p>Pattern-based revision. Priority-first.</p>
+      <div class="hero-eyebrow">D.Pharma · Year 1 &amp; 2</div>
+      <h1 class="hero-title">Crack Your<br><em>Pharm Exam</em></h1>
+      <p class="hero-sub">Pattern-based revision built from 4 years of actual papers.</p>
     </div>
 
-    <div class="stats-strip">
-      <div class="stat-item"><span class="stat-n" id="stat-total">232</span><span class="stat-l">Questions</span></div>
-      <div class="stat-div"></div>
-      <div class="stat-item"><span class="stat-n">5</span><span class="stat-l">Subjects</span></div>
-      <div class="stat-div"></div>
-      <div class="stat-item"><span class="stat-n">168</span><span class="stat-l">Must-Know</span></div>
+    <div class="stats-row">
+      <div class="stat-box">
+        <span class="stat-n" id="stat-total">—</span>
+        <span class="stat-l">Questions</span>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat-box">
+        <span class="stat-n">5</span>
+        <span class="stat-l">Subjects</span>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat-box">
+        <span class="stat-n" id="stat-mustkno">—</span>
+        <span class="stat-l">4-Year Qs</span>
+      </div>
     </div>
 
-    <div class="home-cards">
-      <button class="hcard" id="btn-exam-engine">
-        <div class="hcard-left">
-          <div class="hcard-icon ic-blue">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-          </div>
-          <div>
-            <div class="hcard-title">Exam Engine</div>
-            <div class="hcard-sub">MCQs · Flashcards · Weak Qs · Timer</div>
-          </div>
+    <div class="home-nav-grid">
+      <button class="hnav-card hnav-primary" id="btn-exam-engine">
+        <div class="hnav-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
         </div>
-        <svg class="hcard-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+        <div class="hnav-text">
+          <strong>Exam Engine</strong>
+          <span>MCQ · Flashcards · Weak Qs · Timer</span>
+        </div>
+        <svg class="hnav-arr" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
       </button>
 
-      <button class="hcard" id="btn-paper-view">
-        <div class="hcard-left">
-          <div class="hcard-icon ic-green">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-          </div>
-          <div>
-            <div class="hcard-title">Question Papers</div>
-            <div class="hcard-sub">All years · Common Qs · Full answers</div>
-          </div>
+      <button class="hnav-card hnav-green" id="btn-paper-view">
+        <div class="hnav-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
         </div>
-        <svg class="hcard-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+        <div class="hnav-text">
+          <strong>Question Papers</strong>
+          <span>All years · Common Qs · Full answers</span>
+        </div>
+        <svg class="hnav-arr" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
       </button>
 
-      <button class="hcard hcard-dim" id="btn-notes">
-        <div class="hcard-left">
-          <div class="hcard-icon ic-muted">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-          </div>
-          <div>
-            <div class="hcard-title">Notes Library</div>
-            <div class="hcard-sub">Chapter-wise deep notes</div>
-          </div>
+      <button class="hnav-card hnav-dim" id="btn-notes">
+        <div class="hnav-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
         </div>
-        <span class="soon-tag">Soon</span>
+        <div class="hnav-text">
+          <strong>Notes Library</strong>
+          <span>Chapter-wise deep reading</span>
+        </div>
+        <span class="soon-badge">Soon</span>
       </button>
+    </div>
+
+    <div class="subject-preview-row">
+      <div class="preview-label">Subjects covered</div>
+      <div class="preview-chips">
+        <span class="prev-chip">💊 Pharmaceutics</span>
+        <span class="prev-chip">🌿 Pharmacognosy</span>
+        <span class="prev-chip">🧪 Chem</span>
+        <span class="prev-chip">🫀 Anatomy</span>
+        <span class="prev-chip">🏥 Social Pharm</span>
+      </div>
     </div>
   </section>
 
   <!-- EXAM ENGINE -->
   <section id="screen-engine" class="screen">
+
     <div id="step-subject">
-      <h2 class="step-title">Choose Subject</h2>
+      <div class="step-header">
+        <div class="step-num">01</div>
+        <h2 class="step-title">Choose Subject</h2>
+      </div>
       <div class="subject-grid">
         <button class="subject-btn all-subj" data-subject="all">
-          <span class="sicon">🎯</span><span>All Subjects</span>
+          <span class="sbtn-icon">🎯</span>
+          <span class="sbtn-label">All Subjects</span>
+          <span class="sbtn-count" id="sc-all"></span>
         </button>
         <button class="subject-btn" data-subject="pharmaceutics">
-          <span class="sicon">💊</span><span>Pharmaceutics</span>
+          <span class="sbtn-icon">💊</span>
+          <span class="sbtn-label">Pharmaceutics</span>
+          <span class="sbtn-count" id="sc-pharmaceutics"></span>
         </button>
         <button class="subject-btn" data-subject="pharmacognosy">
-          <span class="sicon">🌿</span><span>Pharmacognosy</span>
+          <span class="sbtn-icon">🌿</span>
+          <span class="sbtn-label">Pharmacognosy</span>
+          <span class="sbtn-count" id="sc-pharmacognosy"></span>
         </button>
         <button class="subject-btn" data-subject="pharm-chemistry">
-          <span class="sicon">🧪</span><span>Pharm Chemistry</span>
+          <span class="sbtn-icon">🧪</span>
+          <span class="sbtn-label">Pharm Chemistry</span>
+          <span class="sbtn-count" id="sc-pharm-chemistry"></span>
         </button>
         <button class="subject-btn" data-subject="anatomy">
-          <span class="sicon">🫀</span><span>Anatomy</span>
+          <span class="sbtn-icon">🫀</span>
+          <span class="sbtn-label">Anatomy</span>
+          <span class="sbtn-count" id="sc-anatomy"></span>
         </button>
         <button class="subject-btn" data-subject="social-pharmacy">
-          <span class="sicon">🏥</span><span>Social Pharmacy</span>
+          <span class="sbtn-icon">🏥</span>
+          <span class="sbtn-label">Social Pharmacy</span>
+          <span class="sbtn-count" id="sc-social-pharmacy"></span>
         </button>
       </div>
     </div>
 
     <div id="step-mode" class="hidden">
-      <h2 class="step-title">Choose Mode</h2>
+      <div class="step-header">
+        <div class="step-num">02</div>
+        <h2 class="step-title">Choose Mode</h2>
+      </div>
       <div class="mode-grid">
         <button class="mode-btn" data-mode="mcq">
-          <span class="micon">✅</span>
-          <span class="mname">MCQ Quiz</span>
-          <span class="mdesc">4 options, feedback</span>
+          <div class="mbtn-top"><span class="mbtn-icon">✅</span><span class="mbtn-name">MCQ Quiz</span></div>
+          <span class="mbtn-desc">4 options · instant feedback</span>
         </button>
         <button class="mode-btn" data-mode="flashcard">
-          <span class="micon">🔁</span>
-          <span class="mname">Flashcard</span>
-          <span class="mdesc">Reveal &amp; assess</span>
+          <div class="mbtn-top"><span class="mbtn-icon">🔁</span><span class="mbtn-name">Flashcard</span></div>
+          <span class="mbtn-desc">Reveal &amp; self-assess</span>
         </button>
         <button class="mode-btn" data-mode="weak">
-          <span class="micon">⚠️</span>
-          <span class="mname">Weak Qs</span>
-          <span class="mdesc">Only wrong ones</span>
+          <div class="mbtn-top"><span class="mbtn-icon">⚠️</span><span class="mbtn-name">Weak Questions</span></div>
+          <span class="mbtn-desc">Only what you got wrong</span>
         </button>
         <button class="mode-btn" data-mode="timer">
-          <span class="micon">⏱️</span>
-          <span class="mname">Timer Mode</span>
-          <span class="mdesc">Exam simulation</span>
+          <div class="mbtn-top"><span class="mbtn-icon">⏱️</span><span class="mbtn-name">Timer Mode</span></div>
+          <span class="mbtn-desc">Exam simulation</span>
         </button>
-        <button class="mode-btn" data-mode="lastday">
-          <span class="micon">🔥</span>
-          <span class="mname">Last Day</span>
-          <span class="mdesc">Priority 4 only</span>
+        <button class="mode-btn mode-fire" data-mode="lastday">
+          <div class="mbtn-top"><span class="mbtn-icon">🔥</span><span class="mbtn-name">Last Day</span></div>
+          <span class="mbtn-desc">Priority 4 only · burn fast</span>
         </button>
         <button class="mode-btn" data-mode="parta">
-          <span class="micon">📝</span>
-          <span class="mname">Part A Focus</span>
-          <span class="mdesc">5 mark answers</span>
+          <div class="mbtn-top"><span class="mbtn-icon">📝</span><span class="mbtn-name">Part A Focus</span></div>
+          <span class="mbtn-desc">5-mark essay answers</span>
         </button>
       </div>
     </div>
 
     <div id="step-start" class="hidden">
+      <div class="step-header">
+        <div class="step-num">03</div>
+        <h2 class="step-title">Ready to Start</h2>
+      </div>
       <div id="session-summary"></div>
       <button id="start-btn">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
         Start Session
       </button>
     </div>
+
   </section>
 
   <!-- QUIZ -->
   <section id="screen-quiz" class="screen">
-    <div id="quiz-header">
-      <div id="quiz-progress-bar"><div id="quiz-progress-fill"></div></div>
-      <div id="quiz-meta-row">
+    <div id="quiz-topbar">
+      <div id="quiz-progress-track"><div id="quiz-progress-fill"></div></div>
+      <div id="quiz-status-row">
         <span id="quiz-counter">1 / 20</span>
-        <span id="quiz-priority-badge"></span>
-        <span id="quiz-timer-display" class="hidden">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
-          <span id="quiz-timer-text">30:00</span>
-        </span>
+        <div id="quiz-badges">
+          <span id="quiz-priority-badge" class="hidden"></span>
+          <span id="quiz-timer-display" class="hidden">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>
+            <span id="quiz-timer-text">30:00</span>
+          </span>
+        </div>
       </div>
     </div>
 
@@ -184,95 +223,137 @@
       <div id="answer-label">Answer</div>
       <div id="answer-text"></div>
       <div id="flashcard-actions">
-        <button id="btn-didnt">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        <button id="btn-didnt" class="fc-btn fc-wrong">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           Didn't Know
         </button>
-        <button id="btn-knew">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>
+        <button id="btn-knew" class="fc-btn fc-right">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20,6 9,17 4,12"/></svg>
           Knew It
         </button>
       </div>
     </div>
 
     <button id="btn-reveal" class="hidden">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
       Reveal Answer
     </button>
 
     <button id="btn-next" class="hidden">
-      Next <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      Next
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
     </button>
   </section>
 
   <!-- RESULT -->
   <section id="screen-result" class="screen">
-    <div id="result-card">
+    <div id="result-wrap">
       <div id="result-emoji"></div>
-      <h2>Session Complete</h2>
+      <h2 id="result-headline">Session Complete</h2>
       <div id="result-score"></div>
       <div id="result-breakdown"></div>
       <div id="result-actions">
-        <button id="btn-retry-weak">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 1 0 .49-3.79"/></svg>
+        <button id="btn-retry-weak" class="btn-secondary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1,4 1,10 7,10"/><path d="M3.51 15a9 9 0 1 0 .49-3.79"/></svg>
           Retry Weak Questions
         </button>
-        <button id="btn-new-session">
-          New Session
-        </button>
+        <button id="btn-new-session" class="btn-primary">New Session</button>
       </div>
     </div>
   </section>
 
   <!-- PAPER VIEW -->
   <section id="screen-paper" class="screen">
-    <h2 class="step-title">Question Papers</h2>
+    <div class="paper-top">
+      <h2 class="paper-screen-title">Question Papers</h2>
+      <p class="paper-screen-sub">Tap any question to see the full answer</p>
+    </div>
 
-    <div class="filter-group">
-      <div class="filter-label">Years Repeated</div>
-      <div class="chip-row" id="year-chips">
-        <button class="chip active" data-years="4">All 4 Years</button>
-        <button class="chip" data-years="3">3+ Years</button>
-        <button class="chip" data-years="2">2+ Years</button>
+    <div class="filter-dock">
+      <div class="fd-group">
+        <div class="fd-label">Frequency</div>
+        <div class="chip-row" id="year-chips">
+          <button class="chip active" data-years="4">4 Years</button>
+          <button class="chip" data-years="3">3+ Years</button>
+          <button class="chip" data-years="2">2+ Years</button>
+          <button class="chip" data-years="1">All</button>
+        </div>
+      </div>
+      <div class="fd-group">
+        <div class="fd-label">Subject</div>
+        <div class="chip-row scrollable" id="subj-chips">
+          <button class="chip active" data-subject="all">All</button>
+          <button class="chip" data-subject="pharmaceutics">💊 Pharmaceutics</button>
+          <button class="chip" data-subject="pharmacognosy">🌿 Pharmacognosy</button>
+          <button class="chip" data-subject="pharm-chemistry">🧪 Chemistry</button>
+          <button class="chip" data-subject="anatomy">🫀 Anatomy</button>
+          <button class="chip" data-subject="social-pharmacy">🏥 Social</button>
+        </div>
+      </div>
+      <div class="fd-group">
+        <div class="fd-label">Question Type</div>
+        <div class="chip-row" id="part-chips">
+          <button class="chip active" data-part="all">All</button>
+          <button class="chip" data-part="A">Long Answer <span class="chip-sub">5 marks</span></button>
+          <button class="chip" data-part="B">Short Answer <span class="chip-sub">3 marks</span></button>
+          <button class="chip" data-part="C">MCQ</button>
+        </div>
       </div>
     </div>
 
-    <div class="filter-group">
-      <div class="filter-label">Subject</div>
-      <div class="chip-row scrollable" id="subj-chips">
-        <button class="chip active" data-subject="all">All</button>
-        <button class="chip" data-subject="pharmaceutics">💊 Pharmaceutics</button>
-        <button class="chip" data-subject="pharmacognosy">🌿 Pharmacognosy</button>
-        <button class="chip" data-subject="pharm-chemistry">🧪 Chemistry</button>
-        <button class="chip" data-subject="anatomy">🫀 Anatomy</button>
-        <button class="chip" data-subject="social-pharmacy">🏥 Social</button>
+    <!-- EXAM PAPER DOCUMENT -->
+    <div id="paper-doc">
+      <div id="paper-doc-header">
+        <div class="pdh-logo">⚕️</div>
+        <div class="pdh-institution">Board of Technical Education</div>
+        <div class="pdh-exam">Diploma in Pharmacy Examination</div>
+        <div class="pdh-rule"></div>
+        <div class="pdh-meta-row">
+          <span>Time: 3 Hours</span>
+          <span id="paper-count-label">Loading…</span>
+          <span>Max Marks: 80</span>
+        </div>
+        <div class="pdh-instructions">Answer all sections. Read each question carefully.</div>
+      </div>
+
+      <div id="paper-section-A" class="paper-section hidden">
+        <div class="paper-section-header">
+          <div class="psec-title">Section A — Long Answer</div>
+          <div class="psec-info">5 Marks Each</div>
+        </div>
+        <div class="paper-qlist" id="plist-A"></div>
+      </div>
+
+      <div id="paper-section-B" class="paper-section hidden">
+        <div class="paper-section-header">
+          <div class="psec-title">Section B — Short Answer</div>
+          <div class="psec-info">3 Marks Each</div>
+        </div>
+        <div class="paper-qlist" id="plist-B"></div>
+      </div>
+
+      <div id="paper-section-C" class="paper-section hidden">
+        <div class="paper-section-header">
+          <div class="psec-title">Section C — Multiple Choice</div>
+          <div class="psec-info">1 Mark Each</div>
+        </div>
+        <div class="paper-qlist" id="plist-C"></div>
+      </div>
+
+      <div id="paper-empty" class="hidden">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <p>No questions match these filters</p>
       </div>
     </div>
-
-    <div class="filter-group">
-      <div class="filter-label">Part</div>
-      <div class="chip-row" id="part-chips">
-        <button class="chip active" data-part="all">All Parts</button>
-        <button class="chip" data-part="A">Part A (5 marks)</button>
-        <button class="chip" data-part="B">Part B (3 marks)</button>
-        <button class="chip" data-part="C">MCQ</button>
-      </div>
-    </div>
-
-    <div id="paper-count-bar">
-      <span id="paper-count">0</span> questions found
-    </div>
-
-    <div id="paper-list"></div>
   </section>
 
   <!-- NOTES -->
   <section id="screen-notes" class="screen">
     <div class="coming-soon-box">
-      <div class="cs-icon">📚</div>
+      <div class="cs-glyph">📚</div>
       <h2>Notes Library</h2>
       <p>Chapter-wise notes are being added. Check back soon.</p>
-      <button id="btn-notes-back">Go to Exam Engine</button>
+      <button id="btn-notes-back" class="btn-primary">Go to Exam Engine</button>
     </div>
   </section>
 
