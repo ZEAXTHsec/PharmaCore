@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>D.Pharma Revision</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- TOP NAV -->
+  <nav id="navbar">
+    <span id="nav-title">D.Pharma</span>
+    <div id="nav-right">
+      <button id="back-btn" class="hidden">← Back</button>
+      <button id="theme-toggle">🌙</button>
+    </div>
+  </nav>
+
+  <!-- ===================== -->
+  <!-- SCREEN 1: HOME        -->
+  <!-- ===================== -->
+  <section id="screen-home" class="screen active">
+    <div class="home-hero">
+      <h1>D.Pharma Revision</h1>
+      <p>4 years of papers. Pattern-based. Priority-first.</p>
+    </div>
+    <div class="card-grid">
+
+      <div class="card" id="btn-exam-engine">
+        <div class="card-icon">📝</div>
+        <div class="card-body">
+          <h2>Exam Engine</h2>
+          <p>Flashcards, MCQs, Weak questions, Timer mode. Based on repeated exam patterns.</p>
+        </div>
+        <div class="card-arrow">→</div>
+      </div>
+
+      <div class="card card-muted" id="btn-notes">
+        <div class="card-icon">📚</div>
+        <div class="card-body">
+          <h2>Notes Library</h2>
+          <p>Chapter-wise notes for deep reading. Links back to practice questions.</p>
+        </div>
+        <div class="card-badge">Coming Soon</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <!-- SCREEN 2: EXAM ENGINE -->
+  <!-- ===================== -->
+  <section id="screen-engine" class="screen">
+
+    <!-- STEP 1: SUBJECT -->
+    <div id="step-subject">
+      <h2 class="step-title">Select Subject</h2>
+      <div class="subject-grid">
+        <button class="subject-btn" data-subject="all">All Subjects</button>
+        <button class="subject-btn" data-subject="pharmaceutics">Pharmaceutics</button>
+        <button class="subject-btn" data-subject="pharmacognosy">Pharmacognosy</button>
+        <button class="subject-btn" data-subject="pharm-chemistry">Pharm Chemistry</button>
+        <button class="subject-btn" data-subject="anatomy">Anatomy</button>
+        <button class="subject-btn" data-subject="social-pharmacy">Social Pharmacy</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: FILTERS -->
+    <div id="step-filters" class="hidden">
+      <h2 class="step-title">Filters <span class="optional">(optional)</span></h2>
+
+      <div class="filter-row">
+        <label>Priority</label>
+        <select id="filter-priority">
+          <option value="all">All</option>
+          <option value="4">4 Year (Guaranteed)</option>
+          <option value="3">3 Year</option>
+          <option value="2">2 Year</option>
+        </select>
+      </div>
+
+      <div class="filter-row">
+        <label>Part</label>
+        <select id="filter-part">
+          <option value="all">All Parts</option>
+          <option value="A">Part A (5 marks)</option>
+          <option value="B">Part B (3 marks)</option>
+          <option value="C">Part C (MCQ)</option>
+        </select>
+      </div>
+
+      <div class="filter-row" id="filter-topic-row" class="hidden">
+        <label>Topic</label>
+        <select id="filter-topic">
+          <option value="all">All Topics</option>
+          <!-- populated dynamically by JS -->
+        </select>
+      </div>
+
+    </div>
+
+    <!-- STEP 3: MODE -->
+    <div id="step-mode" class="hidden">
+      <h2 class="step-title">Select Mode</h2>
+      <div class="mode-grid">
+        <button class="mode-btn" data-mode="flashcard">
+          <span class="mode-icon">🔁</span>
+          <span class="mode-name">Flashcard</span>
+          <span class="mode-desc">Reveal and self-assess</span>
+        </button>
+        <button class="mode-btn" data-mode="mcq">
+          <span class="mode-icon">✅</span>
+          <span class="mode-name">MCQ Quiz</span>
+          <span class="mode-desc">4 options, instant feedback</span>
+        </button>
+        <button class="mode-btn" data-mode="weak">
+          <span class="mode-icon">⚠️</span>
+          <span class="mode-name">Weak Questions</span>
+          <span class="mode-desc">Only what you got wrong</span>
+        </button>
+        <button class="mode-btn" data-mode="timer">
+          <span class="mode-icon">⏱️</span>
+          <span class="mode-name">Timer Mode</span>
+          <span class="mode-desc">30 min or 3 hour simulation</span>
+        </button>
+        <button class="mode-btn" data-mode="lastday">
+          <span class="mode-icon">🔥</span>
+          <span class="mode-name">Last Day</span>
+          <span class="mode-desc">Priority 4 only, burn through fast</span>
+        </button>
+        <button class="mode-btn" data-mode="parta">
+          <span class="mode-icon">📝</span>
+          <span class="mode-name">Part A Focus</span>
+          <span class="mode-desc">5 mark answers only</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 4: START -->
+    <div id="step-start" class="hidden">
+      <div id="session-summary">
+        <!-- JS will fill: X questions, subject, mode -->
+      </div>
+      <button id="start-btn">Start Session</button>
+    </div>
+
+  </section>
+
+  <!-- ===================== -->
+  <!-- SCREEN 3: QUIZ        -->
+  <!-- ===================== -->
+  <section id="screen-quiz" class="screen">
+
+    <!-- PROGRESS BAR -->
+    <div id="quiz-progress-bar">
+      <div id="quiz-progress-fill"></div>
+    </div>
+    <div id="quiz-meta">
+      <span id="quiz-counter">1 / 20</span>
+      <span id="quiz-priority-badge"></span>
+      <span id="quiz-timer-display" class="hidden">30:00</span>
+    </div>
+
+    <!-- QUESTION CARD -->
+    <div id="question-card">
+      <div id="question-subject-tag"></div>
+      <div id="question-text"></div>
+    </div>
+
+    <!-- MCQ OPTIONS -->
+    <div id="mcq-options" class="hidden">
+      <button class="option-btn" data-index="0"></button>
+      <button class="option-btn" data-index="1"></button>
+      <button class="option-btn" data-index="2"></button>
+      <button class="option-btn" data-index="3"></button>
+    </div>
+
+    <!-- FLASHCARD ANSWER -->
+    <div id="flashcard-answer" class="hidden">
+      <div id="answer-text"></div>
+      <div id="flashcard-actions">
+        <button id="btn-knew">I Knew It</button>
+        <button id="btn-didnt">Didn't Know</button>
+      </div>
+    </div>
+
+    <!-- REVEAL BUTTON (flashcard only) -->
+    <button id="btn-reveal" class="hidden">Reveal Answer</button>
+
+    <!-- NEXT -->
+    <button id="btn-next" class="hidden">Next →</button>
+
+  </section>
+
+  <!-- ===================== -->
+  <!-- SCREEN 4: RESULT      -->
+  <!-- ===================== -->
+  <section id="screen-result" class="screen">
+    <div id="result-card">
+      <h2>Session Complete</h2>
+      <div id="result-score"></div>
+      <div id="result-breakdown"></div>
+      <div id="result-actions">
+        <button id="btn-retry-weak">Retry Weak Questions</button>
+        <button id="btn-new-session">New Session</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <!-- SCREEN 5: NOTES       -->
+  <!-- ===================== -->
+  <section id="screen-notes" class="screen">
+    <div class="coming-soon-box">
+      <span>📚</span>
+      <h2>Notes Library</h2>
+      <p>Chapter-wise notes are being added. Check back soon.</p>
+      <button id="btn-notes-back">Go to Exam Engine</button>
+    </div>
+  </section>
+
+  <script src="data/pharmaceutics.js"></script>
+  <script src="data/pharmacognosy.js"></script>
+  <script src="data/pharm-chemistry.js"></script>
+  <script src="data/anatomy.js"></script>
+  <script src="data/social-pharmacy.js"></script>
+  <script src="app.js"></script>
+
+</body>
+</html>
