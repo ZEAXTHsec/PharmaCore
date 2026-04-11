@@ -3,9 +3,6 @@
    ===================== */
 const state = {
   subject:  null,
-  priority: 'all',
-  part:     'all',
-  topic:    'all',
   mode:     null,
   questions:   [],
   current:     0,
@@ -15,14 +12,10 @@ const state = {
   timerSeconds:  0,
 };
 
-/* =====================
-   ALL QUESTIONS POOL
-   (populated from data files)
-   ===================== */
 let ALL_QUESTIONS = [];
 
 /* =====================
-   LOCALSTORAGE HELPERS
+   LOCALSTORAGE
    ===================== */
 const LS = {
   key: 'dpharma_progress',
@@ -33,7 +26,7 @@ const LS = {
   },
 
   save(data) {
-    localStorage.setItem(this.key, JSON.stringify(data));
+    try { localStorage.setItem(this.key, JSON.stringify(data)); } catch {}
   },
 
   markWrong(id) {
@@ -62,13 +55,8 @@ const LS = {
     this.save(d);
   },
 
-  getTheme() {
-    return localStorage.getItem('dpharma_theme') || 'dark';
-  },
-
-  setTheme(t) {
-    localStorage.setItem('dpharma_theme', t);
-  }
+  getTheme() { return localStorage.getItem('dpharma_theme') || 'dark'; },
+  setTheme(t) { localStorage.setItem('dpharma_theme', t); }
 };
 
 /* =====================
@@ -77,14 +65,19 @@ const LS = {
 function initTheme() {
   const t = LS.getTheme();
   document.documentElement.setAttribute('data-theme', t);
-  document.getElementById('theme-toggle').textContent = t === 'dark' ? '☀️' : '🌙';
+  toggleThemeIcons(t);
+}
+
+function toggleThemeIcons(t) {
+  document.getElementById('icon-moon').classList.toggle('hidden', t === 'light');
+  document.getElementById('icon-sun').classList.toggle('hidden', t === 'dark');
 }
 
 document.getElementById('theme-toggle').addEventListener('click', () => {
   const curr = document.documentElement.getAttribute('data-theme');
   const next = curr === 'dark' ? 'light' : 'dark';
   document.documentElement.setAttribute('data-theme', next);
-  document.getElementById('theme-toggle').textContent = next === 'dark' ? '☀️' : '🌙';
+  toggleThemeIcons(next);
   LS.setTheme(next);
 });
 
@@ -94,12 +87,10 @@ document.getElementById('theme-toggle').addEventListener('click', () => {
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-
-  const backBtn = document.getElementById('back-btn');
-  backBtn.classList.toggle('hidden', id === 'screen-home');
+  document.getElementById('back-btn').classList.toggle('hidden', id === 'screen-home');
+  window.scrollTo(0, 0);
 }
 
-// Back button logic
 document.getElementById('back-btn').addEventListener('click', () => {
   const active = document.querySelector('.screen.active').id;
   if (active === 'screen-engine') {
@@ -111,7 +102,7 @@ document.getElementById('back-btn').addEventListener('click', () => {
   } else if (active === 'screen-result') {
     showScreen('screen-engine');
     resetEngineSteps();
-  } else if (active === 'screen-notes') {
+  } else if (active === 'screen-paper') {
     showScreen('screen-home');
   } else {
     showScreen('screen-home');
@@ -119,12 +110,17 @@ document.getElementById('back-btn').addEventListener('click', () => {
 });
 
 /* =====================
-   HOME
+   HOME NAV
    ===================== */
 document.getElementById('btn-exam-engine').addEventListener('click', () => {
   showScreen('screen-engine');
   resetEngineSteps();
   showStep('step-subject');
+});
+
+document.getElementById('btn-paper-view').addEventListener('click', () => {
+  showScreen('screen-paper');
+  renderPaper();
 });
 
 document.getElementById('btn-notes').addEventListener('click', () => {
@@ -144,26 +140,20 @@ function showStep(id) {
   steps.forEach((s, i) => {
     const el = document.getElementById(s);
     if (el) {
-      if (i <= idx) el.classList.remove('hidden');
-      else el.classList.add('hidden');
+      el.classList.toggle('hidden', i > idx);
     }
   });
 }
 
 function resetEngineSteps() {
-  state.subject  = null;
-  state.priority = 'all';
-  state.part     = 'all';
-  state.topic    = 'all';
-  state.mode     = null;
-
+  state.subject = null;
+  state.mode    = null;
   document.querySelectorAll('.subject-btn').forEach(b => b.classList.remove('selected'));
   document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('selected'));
-
   showStep('step-subject');
 }
 
-/* ---- SUBJECT SELECTION ---- */
+/* ---- SUBJECT ---- */
 document.querySelectorAll('.subject-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.subject-btn').forEach(b => b.classList.remove('selected'));
@@ -174,7 +164,7 @@ document.querySelectorAll('.subject-btn').forEach(btn => {
   });
 });
 
-/* ---- MODE SELECTION ---- */
+/* ---- MODE ---- */
 document.querySelectorAll('.mode-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('selected'));
@@ -185,45 +175,23 @@ document.querySelectorAll('.mode-btn').forEach(btn => {
   });
 });
 
-/* ---- SESSION SUMMARY ---- */
+/* ---- FILTER + SUMMARY ---- */
 function getFilteredQuestions() {
   let pool = ALL_QUESTIONS;
 
-  // subject
   if (state.subject && state.subject !== 'all') {
     pool = pool.filter(q => q.subject === state.subject);
   }
 
-  // mode overrides
   if (state.mode === 'weak') {
     const wrongIds = LS.getWrongIds();
     pool = pool.filter(q => wrongIds.includes(String(q.id)));
   }
 
-  if (state.mode === 'lastday') {
-    pool = pool.filter(q => q.priority === 4);
-  }
+  if (state.mode === 'lastday') pool = pool.filter(q => q.priority === 4);
+  if (state.mode === 'parta')   pool = pool.filter(q => q.part === 'A');
 
-  if (state.mode === 'parta') {
-    pool = pool.filter(q => q.part === 'A');
-  }
-
-  // filters
-  if (state.priority !== 'all') {
-    pool = pool.filter(q => q.priority === Number(state.priority));
-  }
-
-  if (state.part !== 'all') {
-    pool = pool.filter(q => q.part === state.part);
-  }
-
-  if (state.topic !== 'all') {
-    pool = pool.filter(q => q.topic === state.topic);
-  }
-
-  // sort by priority desc
   pool.sort((a, b) => (b.priority || 0) - (a.priority || 0));
-
   return pool;
 }
 
@@ -232,48 +200,66 @@ function updateStartSummary() {
 
   const pool = getFilteredQuestions();
   const modeLabels = {
-    flashcard: 'Flashcard',
-    mcq:       'MCQ Quiz',
-    weak:      'Weak Questions',
-    timer:     'Timer Mode',
-    lastday:   'Last Day',
-    parta:     'Part A Focus'
+    mcq: 'MCQ Quiz', flashcard: 'Flashcard', weak: 'Weak Questions',
+    timer: 'Timer Mode', lastday: 'Last Day', parta: 'Part A Focus'
   };
 
-  const subjectLabel = state.subject === 'all'
+  const subLabel = state.subject === 'all'
     ? 'All Subjects'
     : state.subject.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase());
 
   document.getElementById('session-summary').innerHTML = `
-    <strong>Subject:</strong> ${subjectLabel}<br>
+    <strong>Subject:</strong> ${subLabel}<br>
     <strong>Mode:</strong> ${modeLabels[state.mode]}<br>
-    <strong>Questions:</strong> ${pool.length}<br>
-    ${state.priority !== 'all' ? `<strong>Priority:</strong> ${state.priority} Year<br>` : ''}
-    ${state.part !== 'all' ? `<strong>Part:</strong> Part ${state.part}<br>` : ''}
-    ${state.topic !== 'all' ? `<strong>Topic:</strong> ${state.topic}<br>` : ''}
+    <strong>Questions:</strong> ${pool.length}
   `;
 }
 
 /* ---- START ---- */
 document.getElementById('start-btn').addEventListener('click', () => {
   const pool = getFilteredQuestions();
-
   if (pool.length === 0) {
-    alert('No questions match your filters. Try adjusting them.');
+    alert('No questions match. Try a different mode or subject.');
     return;
   }
-
   state.questions = shuffle(pool);
   state.current   = 0;
   state.score     = 0;
   state.wrong     = [];
-
   LS.saveSession(state.subject, state.mode);
   showScreen('screen-quiz');
   loadQuestion();
-
   if (state.mode === 'timer') startTimer();
 });
+
+/* =====================
+   ANSWER FORMATTER
+   ===================== */
+function formatAnswer(raw) {
+  if (!raw) return '';
+  let s = raw
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  // Section labels ending with colon
+  s = s.replace(/\b([A-Z][A-Za-z /\-]+):/g,
+    '<br><span class="ans-label">$1:</span>');
+
+  // Numbered points
+  s = s.replace(/(\s)(\d+)\.\s/g, '<br><strong>$2.</strong> ');
+
+  // Bullets
+  s = s.replace(/•\s*/g, '<br><span class="ans-bullet">&bull;</span> ');
+
+  // Arrows
+  s = s.replace(/→/g, '<span class="ans-arrow"> → </span>');
+
+  // Clean leading <br>
+  s = s.replace(/^(<br>\s*)+/, '');
+
+  return s;
+}
 
 /* =====================
    QUIZ LOGIC
@@ -282,34 +268,28 @@ function loadQuestion() {
   const q   = state.questions[state.current];
   const tot = state.questions.length;
 
-  // progress
-  const pct = ((state.current) / tot) * 100;
+  const pct = (state.current / tot) * 100;
   document.getElementById('quiz-progress-fill').style.width = pct + '%';
   document.getElementById('quiz-counter').textContent = `${state.current + 1} / ${tot}`;
 
-  // priority badge
   const badge = document.getElementById('quiz-priority-badge');
   if (q.priority) {
     badge.textContent = `${q.priority}yr`;
-    badge.style.display = 'inline';
+    badge.style.display = '';
   } else {
     badge.style.display = 'none';
   }
 
-  // subject tag
   document.getElementById('question-subject-tag').textContent =
-    (q.subject || '').replace('-', ' ').toUpperCase();
+    (q.subject || '').replace(/-/g, ' ').toUpperCase();
 
-  // question text
   document.getElementById('question-text').textContent = q.q;
 
-  // hide all action areas
   hide('mcq-options');
   hide('flashcard-answer');
   hide('btn-reveal');
   hide('btn-next');
 
-  // mode routing — everything shows MCQ options except Part A (reading mode)
   if (state.mode === 'parta') {
     loadPartA(q);
   } else {
@@ -317,23 +297,21 @@ function loadQuestion() {
   }
 }
 
-/* ---- AUTO-GENERATE OPTIONS for questions without them ---- */
+/* ---- AUTO OPTIONS ---- */
 function buildOptions(q) {
   if (q.options && q.options.length === 4) {
     return { options: q.options, correct: q.correct };
   }
 
-  // Pick wrong answers from same subject first, then global
   const correctAns = (q.a || '').trim();
-  let pool = ALL_QUESTIONS
+  const pool = ALL_QUESTIONS
     .filter(x => x.id !== q.id && x.a && x.a.trim() !== correctAns)
     .map(x => x.a.trim());
 
-  const unique = [...new Set(pool)];
-  const shuffledPool = shuffle(unique);
-  const distractors = shuffledPool.slice(0, 3);
+  const unique  = [...new Set(pool)];
+  const shuffled = shuffle(unique);
+  const distractors = shuffled.slice(0, 3);
 
-  // Insert correct answer at random position
   const correctPos = Math.floor(Math.random() * 4);
   const options = [...distractors];
   options.splice(correctPos, 0, correctAns);
@@ -349,11 +327,13 @@ function loadMCQ(q) {
 
   show('mcq-options');
   const btns = document.querySelectorAll('.option-btn');
+  const letters = ['A','B','C','D'];
   btns.forEach((btn, i) => {
-    btn.textContent = options[i] || '';
-    btn.className   = 'option-btn';
-    btn.disabled    = false;
-    btn.onclick     = () => handleMCQ(i, q);
+    btn.querySelector('.opt-text').textContent = options[i] || '';
+    btn.querySelector('.opt-letter').textContent = letters[i];
+    btn.className  = 'option-btn';
+    btn.disabled   = false;
+    btn.onclick    = () => handleMCQ(i, q);
   });
 }
 
@@ -380,7 +360,7 @@ function handleMCQ(chosen, q) {
 /* ---- FLASHCARD ---- */
 function loadFlashcard(q) {
   show('btn-reveal');
-  document.getElementById('answer-text').textContent = q.a;
+  document.getElementById('answer-text').innerHTML = formatAnswer(q.a);
   hide('flashcard-answer');
 }
 
@@ -403,13 +383,12 @@ document.getElementById('btn-didnt').addEventListener('click', () => {
   nextQuestion();
 });
 
-/* ---- PART A FOCUS ---- */
+/* ---- PART A ---- */
 function loadPartA(q) {
-  // show answer immediately — this mode is for reading practice
-  document.getElementById('answer-text').textContent = q.a;
+  document.getElementById('answer-text').innerHTML = formatAnswer(q.a);
   show('flashcard-answer');
-  hide('flashcard-actions'); // no marking needed in reading mode
-  document.getElementById('flashcard-answer').style.marginTop = '1rem';
+  document.getElementById('flashcard-actions').style.display = 'none';
+  document.getElementById('answer-label').style.display = 'none';
   show('btn-next');
 }
 
@@ -417,6 +396,10 @@ function loadPartA(q) {
 document.getElementById('btn-next').addEventListener('click', nextQuestion);
 
 function nextQuestion() {
+  // Reset flashcard actions visibility
+  document.getElementById('flashcard-actions').style.display = '';
+  document.getElementById('answer-label').style.display = '';
+
   state.current++;
   if (state.current >= state.questions.length) {
     endSession();
@@ -439,7 +422,7 @@ function startTimer() {
     state.timerSeconds--;
     const m = String(Math.floor(state.timerSeconds / 60)).padStart(2, '0');
     const s = String(state.timerSeconds % 60).padStart(2, '0');
-    display.textContent = `${m}:${s}`;
+    document.getElementById('quiz-timer-text').textContent = `${m}:${s}`;
 
     if (state.timerSeconds <= 0) {
       clearTimer();
@@ -467,18 +450,16 @@ function endSession() {
   const score = state.score;
   const pct   = tot > 0 ? Math.round((score / tot) * 100) : 0;
 
+  // Pick emoji based on score
+  const emoji = pct >= 80 ? '🎉' : pct >= 60 ? '👍' : pct >= 40 ? '📚' : '💪';
+  document.getElementById('result-emoji').textContent = emoji;
   document.getElementById('result-score').textContent = `${pct}%`;
   document.getElementById('result-breakdown').innerHTML = `
     ${score} correct out of ${tot}<br>
     ${state.wrong.length} questions to review
   `;
 
-  const retryBtn = document.getElementById('btn-retry-weak');
-  if (state.wrong.length === 0) {
-    retryBtn.classList.add('hidden');
-  } else {
-    retryBtn.classList.remove('hidden');
-  }
+  document.getElementById('btn-retry-weak').classList.toggle('hidden', state.wrong.length === 0);
 }
 
 document.getElementById('btn-retry-weak').addEventListener('click', () => {
@@ -495,6 +476,121 @@ document.getElementById('btn-new-session').addEventListener('click', () => {
   showScreen('screen-engine');
   resetEngineSteps();
 });
+
+/* =====================
+   PAPER VIEW
+   ===================== */
+let paperState = {
+  years:   4,
+  subject: 'all',
+  part:    'all',
+};
+
+// Wire up year chips
+document.querySelectorAll('#year-chips .chip').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#year-chips .chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    paperState.years = Number(btn.dataset.years);
+    renderPaper();
+  });
+});
+
+// Wire up subject chips
+document.querySelectorAll('#subj-chips .chip').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#subj-chips .chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    paperState.subject = btn.dataset.subject;
+    renderPaper();
+  });
+});
+
+// Wire up part chips
+document.querySelectorAll('#part-chips .chip').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#part-chips .chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    paperState.part = btn.dataset.part;
+    renderPaper();
+  });
+});
+
+function getPaperQuestions() {
+  let pool = ALL_QUESTIONS;
+
+  // Filter by years (priority)
+  pool = pool.filter(q => (q.priority || 1) >= paperState.years);
+
+  if (paperState.subject !== 'all') {
+    pool = pool.filter(q => q.subject === paperState.subject);
+  }
+
+  if (paperState.part !== 'all') {
+    pool = pool.filter(q => q.part === paperState.part);
+  }
+
+  // Sort: Part A first, then B, then C; within each by priority desc
+  const partOrder = { A: 0, B: 1, C: 2 };
+  pool.sort((a, b) => {
+    const pDiff = (partOrder[a.part] || 2) - (partOrder[b.part] || 2);
+    if (pDiff !== 0) return pDiff;
+    return (b.priority || 0) - (a.priority || 0);
+  });
+
+  return pool;
+}
+
+function subjectLabel(s) {
+  const map = {
+    'pharmaceutics': 'Pharmaceutics',
+    'pharmacognosy': 'Pharmacognosy',
+    'pharm-chemistry': 'Pharm Chemistry',
+    'anatomy': 'Anatomy',
+    'social-pharmacy': 'Social Pharmacy'
+  };
+  return map[s] || s;
+}
+
+function renderPaper() {
+  const pool = getPaperQuestions();
+  document.getElementById('paper-count').textContent = pool.length;
+  const list = document.getElementById('paper-list');
+
+  list.innerHTML = pool.map((q, idx) => {
+    const badgeClass = `badge-${q.part}`;
+    const partLabel  = q.part === 'A' ? '5 marks' : q.part === 'B' ? '3 marks' : 'MCQ';
+    const yrLabel    = q.priority ? `${q.priority}yr` : '';
+
+    return `
+      <div class="paper-item" data-idx="${idx}">
+        <div class="paper-q" onclick="togglePaperItem(this)">
+          <div class="paper-meta">
+            <span class="paper-part-badge ${badgeClass}">${q.part}</span>
+            ${yrLabel ? `<span class="paper-yr">${yrLabel}</span>` : ''}
+          </div>
+          <div class="paper-q-text">${escapeHtml(q.q)}</div>
+          <svg class="paper-expand-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+        <div class="paper-ans">
+          <div class="paper-ans-inner">
+            <div class="paper-subj-tag">${subjectLabel(q.subject)} · Part ${q.part} · ${partLabel}</div>
+            ${formatAnswer(q.a)}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function togglePaperItem(el) {
+  const item = el.closest('.paper-item');
+  item.classList.toggle('open');
+}
+
+function escapeHtml(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
 
 /* =====================
    UTILITIES
@@ -515,7 +611,6 @@ function hide(id) { document.getElementById(id).classList.add('hidden'); }
    INIT
    ===================== */
 function init() {
-  // collect all questions from data files
   const sources = [
     window.pharmaceutics,
     window.pharmacognosy,
@@ -528,10 +623,13 @@ function init() {
     if (Array.isArray(src)) ALL_QUESTIONS = ALL_QUESTIONS.concat(src);
   });
 
-  // assign ids if missing
   ALL_QUESTIONS.forEach((q, i) => {
     if (!q.id) q.id = i;
   });
+
+  // Update home stats
+  const totalEl = document.getElementById('stat-total');
+  if (totalEl) totalEl.textContent = ALL_QUESTIONS.length;
 
   initTheme();
   showScreen('screen-home');
