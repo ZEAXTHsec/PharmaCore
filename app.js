@@ -104,6 +104,8 @@ document.getElementById('back-btn').addEventListener('click', () => {
     resetEngineSteps();
   } else if (active === 'screen-paper') {
     showScreen('screen-home');
+  } else if (active === 'screen-lastday') {
+    showScreen('screen-home');
   } else {
     showScreen('screen-home');
   }
@@ -123,12 +125,24 @@ document.getElementById('btn-paper-view').addEventListener('click', () => {
   renderPaper();
 });
 
+document.getElementById('btn-lastday').addEventListener('click', () => {
+  showScreen('screen-lastday');
+  initLastDay();
+});
+
 document.getElementById('btn-notes').addEventListener('click', () => {
   showScreen('screen-notes');
 });
 
 document.getElementById('btn-notes-back').addEventListener('click', () => {
   showScreen('screen-engine');
+});
+
+// Nav brand = go home
+document.getElementById('nav-brand').addEventListener('click', () => {
+  showScreen('screen-home');
+  resetEngineSteps();
+  clearTimer();
 });
 
 /* =====================
@@ -294,10 +308,15 @@ function buildOptions(q) {
     return { options: q.options, correct: q.correct };
   }
 
-  const correctAns = (q.a || '').trim();
+  const correctAns = (q.a || '').split('\n')[0].trim().substring(0, 60);
   const pool = ALL_QUESTIONS
-    .filter(x => x.id !== q.id && x.a && x.a.trim() !== correctAns)
-    .map(x => x.a.trim());
+    .filter(x => x.id !== q.id && x.a)
+    .map(x => {
+      // Use only first line and truncate for MCQ readability
+      const ans = x.a.trim().split('\n')[0].trim();
+      return ans.length > 60 ? ans.substring(0, 57) + '…' : ans;
+    })
+    .filter(a => a !== correctAns);
 
   const unique   = [...new Set(pool)];
   const shuffled = shuffle(unique);
@@ -646,6 +665,97 @@ function shuffle(arr) {
 
 function show(id) { document.getElementById(id).classList.remove('hidden'); }
 function hide(id) { document.getElementById(id).classList.add('hidden'); }
+
+/* =====================
+   LAST DAY GUIDE
+   ===================== */
+let ldState = {
+  lang: 'english',
+  subject: null,
+};
+
+function initLastDay() {
+  if (!window.lastDayData) return;
+  ldState.subject = window.lastDayData.subjects[0].id;
+  renderLdTabs();
+  renderLdContent();
+
+  // Lang toggle
+  document.querySelectorAll('.ld-lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.ld-lang-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      ldState.lang = btn.dataset.lang;
+      renderLdContent();
+    });
+  });
+}
+
+function renderLdTabs() {
+  const tabsEl = document.getElementById('ld-subject-tabs');
+  tabsEl.innerHTML = window.lastDayData.subjects.map(s => `
+    <button class="ld-tab ${s.id === ldState.subject ? 'active' : ''}" 
+            data-subj="${s.id}" 
+            style="--tab-color:${s.color}">
+      <span>${s.icon}</span><span>${s.label}</span>
+    </button>
+  `).join('');
+
+  tabsEl.querySelectorAll('.ld-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabsEl.querySelectorAll('.ld-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      ldState.subject = btn.dataset.subj;
+      renderLdContent();
+      document.getElementById('ld-content').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+}
+
+function renderLdContent() {
+  const subj = window.lastDayData.subjects.find(s => s.id === ldState.subject);
+  if (!subj) return;
+  const lang = ldState.lang;
+  const contentEl = document.getElementById('ld-content');
+
+  contentEl.innerHTML = subj.topics.map((topic, ti) => {
+    const data = topic[lang];
+    const points = data.points.map((pt, pi) => `
+      <div class="ld-point ${pt.highlight ? 'ld-point-hi' : ''}">
+        <span class="ld-point-dot">${pt.highlight ? '★' : '·'}</span>
+        <span>${escapeHtml(pt.text)}</span>
+      </div>
+    `).join('');
+
+    const tags = topic.tags.map(t => `<span class="ld-tag">${t}</span>`).join('');
+
+    return `
+      <div class="ld-card" data-topic="${topic.id}">
+        <div class="ld-card-header" onclick="toggleLdCard(this)">
+          <div class="ld-card-left">
+            <span class="ld-card-emoji">${topic.emoji}</span>
+            <div class="ld-card-info">
+              <div class="ld-card-title">${escapeHtml(topic.title)}</div>
+              <div class="ld-card-tags">${tags}</div>
+            </div>
+          </div>
+          <svg class="ld-card-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+        <div class="ld-card-body">
+          <div class="ld-hook">${escapeHtml(data.hook)}</div>
+          <div class="ld-points">${points}</div>
+          ${data.memory_trick ? `<div class="ld-trick">${escapeHtml(data.memory_trick)}</div>` : ''}
+          ${data.exam_tip ? `<div class="ld-examtip">${escapeHtml(data.exam_tip)}</div>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function toggleLdCard(headerEl) {
+  const card = headerEl.closest('.ld-card');
+  card.classList.toggle('open');
+}
 
 /* =====================
    INIT
