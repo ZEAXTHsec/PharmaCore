@@ -309,27 +309,48 @@ function loadQuestion() {
   hide('btn-reveal');
   hide('btn-next');
 
-  // mode routing
-  if (state.mode === 'mcq' || (state.mode === 'timer' && q.type === 'mcq')) {
-    loadMCQ(q);
-  } else if (state.mode === 'parta') {
+  // mode routing — everything shows MCQ options except Part A (reading mode)
+  if (state.mode === 'parta') {
     loadPartA(q);
   } else {
-    loadFlashcard(q);
+    loadMCQ(q);
   }
+}
+
+/* ---- AUTO-GENERATE OPTIONS for questions without them ---- */
+function buildOptions(q) {
+  if (q.options && q.options.length === 4) {
+    return { options: q.options, correct: q.correct };
+  }
+
+  // Pick wrong answers from same subject first, then global
+  const correctAns = (q.a || '').trim();
+  let pool = ALL_QUESTIONS
+    .filter(x => x.id !== q.id && x.a && x.a.trim() !== correctAns)
+    .map(x => x.a.trim());
+
+  const unique = [...new Set(pool)];
+  const shuffledPool = shuffle(unique);
+  const distractors = shuffledPool.slice(0, 3);
+
+  // Insert correct answer at random position
+  const correctPos = Math.floor(Math.random() * 4);
+  const options = [...distractors];
+  options.splice(correctPos, 0, correctAns);
+
+  return { options, correct: correctPos };
 }
 
 /* ---- MCQ ---- */
 function loadMCQ(q) {
-  if (!q.options || q.options.length === 0) {
-    loadFlashcard(q);
-    return;
-  }
+  const { options, correct } = buildOptions(q);
+  q._opts    = options;
+  q._correct = correct;
 
   show('mcq-options');
   const btns = document.querySelectorAll('.option-btn');
   btns.forEach((btn, i) => {
-    btn.textContent = q.options[i] || '';
+    btn.textContent = options[i] || '';
     btn.className   = 'option-btn';
     btn.disabled    = false;
     btn.onclick     = () => handleMCQ(i, q);
@@ -340,13 +361,15 @@ function handleMCQ(chosen, q) {
   const btns = document.querySelectorAll('.option-btn');
   btns.forEach(b => b.disabled = true);
 
-  if (chosen === q.correct) {
+  const correctIdx = (q._correct !== undefined) ? q._correct : q.correct;
+
+  if (chosen === correctIdx) {
     btns[chosen].classList.add('correct');
     state.score++;
     LS.markKnown(q.id);
   } else {
     btns[chosen].classList.add('wrong');
-    btns[q.correct].classList.add('correct');
+    btns[correctIdx].classList.add('correct');
     state.wrong.push(q);
     LS.markWrong(q.id);
   }
