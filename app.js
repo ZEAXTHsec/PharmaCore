@@ -139,13 +139,14 @@ document.getElementById('btn-notes-back').addEventListener('click', () => {
    ENGINE STEPS
    ===================== */
 function showStep(id) {
-  // show all steps up to and including this one
-  const steps = ['step-subject', 'step-filters', 'step-mode', 'step-start'];
+  const steps = ['step-subject', 'step-mode', 'step-start'];
   const idx = steps.indexOf(id);
   steps.forEach((s, i) => {
     const el = document.getElementById(s);
-    if (i <= idx) el.classList.remove('hidden');
-    else el.classList.add('hidden');
+    if (el) {
+      if (i <= idx) el.classList.remove('hidden');
+      else el.classList.add('hidden');
+    }
   });
 }
 
@@ -159,10 +160,6 @@ function resetEngineSteps() {
   document.querySelectorAll('.subject-btn').forEach(b => b.classList.remove('selected'));
   document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('selected'));
 
-  document.getElementById('filter-priority').value = 'all';
-  document.getElementById('filter-part').value     = 'all';
-  document.getElementById('filter-topic').value    = 'all';
-
   showStep('step-subject');
 }
 
@@ -172,56 +169,10 @@ document.querySelectorAll('.subject-btn').forEach(btn => {
     document.querySelectorAll('.subject-btn').forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
     state.subject = btn.dataset.subject;
-
-    populateTopics(state.subject);
-    showStep('step-filters');
+    showStep('step-mode');
     updateStartSummary();
   });
 });
-
-/* ---- FILTERS ---- */
-document.getElementById('filter-priority').addEventListener('change', e => {
-  state.priority = e.target.value;
-  updateStartSummary();
-});
-
-document.getElementById('filter-part').addEventListener('change', e => {
-  state.part = e.target.value;
-  updateStartSummary();
-});
-
-document.getElementById('filter-topic').addEventListener('change', e => {
-  state.topic = e.target.value;
-  updateStartSummary();
-});
-
-function populateTopics(subject) {
-  const topicRow = document.getElementById('filter-topic-row');
-  const topicSel = document.getElementById('filter-topic');
-
-  if (subject === 'all') {
-    topicRow.classList.add('hidden');
-    return;
-  }
-
-  const pool = ALL_QUESTIONS.filter(q => q.subject === subject);
-  const topics = [...new Set(pool.map(q => q.topic).filter(Boolean))].sort();
-
-  if (topics.length === 0) {
-    topicRow.classList.add('hidden');
-    return;
-  }
-
-  topicSel.innerHTML = '<option value="all">All Topics</option>';
-  topics.forEach(t => {
-    const opt = document.createElement('option');
-    opt.value = t;
-    opt.textContent = t.charAt(0).toUpperCase() + t.slice(1);
-    topicSel.appendChild(opt);
-  });
-
-  topicRow.classList.remove('hidden');
-}
 
 /* ---- MODE SELECTION ---- */
 document.querySelectorAll('.mode-btn').forEach(btn => {
