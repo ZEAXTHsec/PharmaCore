@@ -139,9 +139,7 @@ function showStep(id) {
   const idx = steps.indexOf(id);
   steps.forEach((s, i) => {
     const el = document.getElementById(s);
-    if (el) {
-      el.classList.toggle('hidden', i > idx);
-    }
+    if (el) el.classList.toggle('hidden', i > idx);
   });
 }
 
@@ -242,20 +240,11 @@ function formatAnswer(raw) {
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
 
-  // Section labels ending with colon
   s = s.replace(/\b([A-Z][A-Za-z /\-]+):/g,
     '<br><span class="ans-label">$1:</span>');
-
-  // Numbered points
   s = s.replace(/(\s)(\d+)\.\s/g, '<br><strong>$2.</strong> ');
-
-  // Bullets
   s = s.replace(/•\s*/g, '<br><span class="ans-bullet">&bull;</span> ');
-
-  // Arrows
   s = s.replace(/→/g, '<span class="ans-arrow"> → </span>');
-
-  // Clean leading <br>
   s = s.replace(/^(<br>\s*)+/, '');
 
   return s;
@@ -275,9 +264,9 @@ function loadQuestion() {
   const badge = document.getElementById('quiz-priority-badge');
   if (q.priority) {
     badge.textContent = `${q.priority}yr`;
-    badge.style.display = '';
+    badge.classList.remove('hidden');
   } else {
-    badge.style.display = 'none';
+    badge.classList.add('hidden');
   }
 
   document.getElementById('question-subject-tag').textContent =
@@ -292,6 +281,8 @@ function loadQuestion() {
 
   if (state.mode === 'parta') {
     loadPartA(q);
+  } else if (state.mode === 'flashcard') {
+    loadFlashcard(q);
   } else {
     loadMCQ(q);
   }
@@ -308,7 +299,7 @@ function buildOptions(q) {
     .filter(x => x.id !== q.id && x.a && x.a.trim() !== correctAns)
     .map(x => x.a.trim());
 
-  const unique  = [...new Set(pool)];
+  const unique   = [...new Set(pool)];
   const shuffled = shuffle(unique);
   const distractors = shuffled.slice(0, 3);
 
@@ -331,9 +322,9 @@ function loadMCQ(q) {
   btns.forEach((btn, i) => {
     btn.querySelector('.opt-text').textContent = options[i] || '';
     btn.querySelector('.opt-letter').textContent = letters[i];
-    btn.className  = 'option-btn';
-    btn.disabled   = false;
-    btn.onclick    = () => handleMCQ(i, q);
+    btn.className = 'option-btn';
+    btn.disabled  = false;
+    btn.onclick   = () => handleMCQ(i, q);
   });
 }
 
@@ -396,7 +387,6 @@ function loadPartA(q) {
 document.getElementById('btn-next').addEventListener('click', nextQuestion);
 
 function nextQuestion() {
-  // Reset flashcard actions visibility
   document.getElementById('flashcard-actions').style.display = '';
   document.getElementById('answer-label').style.display = '';
 
@@ -450,7 +440,6 @@ function endSession() {
   const score = state.score;
   const pct   = tot > 0 ? Math.round((score / tot) * 100) : 0;
 
-  // Pick emoji based on score
   const emoji = pct >= 80 ? '🎉' : pct >= 60 ? '👍' : pct >= 40 ? '📚' : '💪';
   document.getElementById('result-emoji').textContent = emoji;
   document.getElementById('result-score').textContent = `${pct}%`;
@@ -486,7 +475,6 @@ let paperState = {
   part:    'all',
 };
 
-// Wire up year chips
 document.querySelectorAll('#year-chips .chip').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('#year-chips .chip').forEach(b => b.classList.remove('active'));
@@ -496,7 +484,6 @@ document.querySelectorAll('#year-chips .chip').forEach(btn => {
   });
 });
 
-// Wire up subject chips
 document.querySelectorAll('#subj-chips .chip').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('#subj-chips .chip').forEach(b => b.classList.remove('active'));
@@ -506,7 +493,6 @@ document.querySelectorAll('#subj-chips .chip').forEach(btn => {
   });
 });
 
-// Wire up part chips
 document.querySelectorAll('#part-chips .chip').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('#part-chips .chip').forEach(b => b.classList.remove('active'));
@@ -519,7 +505,6 @@ document.querySelectorAll('#part-chips .chip').forEach(btn => {
 function getPaperQuestions() {
   let pool = ALL_QUESTIONS;
 
-  // Filter by years (priority)
   pool = pool.filter(q => (q.priority || 1) >= paperState.years);
 
   if (paperState.subject !== 'all') {
@@ -530,7 +515,6 @@ function getPaperQuestions() {
     pool = pool.filter(q => q.part === paperState.part);
   }
 
-  // Sort: Part A first, then B, then C; within each by priority desc
   const partOrder = { A: 0, B: 1, C: 2 };
   pool.sort((a, b) => {
     const pDiff = (partOrder[a.part] || 2) - (partOrder[b.part] || 2);
@@ -541,51 +525,107 @@ function getPaperQuestions() {
   return pool;
 }
 
-function subjectLabel(s) {
-  const map = {
-    'pharmaceutics': 'Pharmaceutics',
-    'pharmacognosy': 'Pharmacognosy',
-    'pharm-chemistry': 'Pharm Chemistry',
-    'anatomy': 'Anatomy',
-    'social-pharmacy': 'Social Pharmacy'
-  };
-  return map[s] || s;
-}
+const subjectNames = {
+  'pharmaceutics': 'Pharmaceutics',
+  'pharmacognosy': 'Pharmacognosy',
+  'pharm-chemistry': 'Pharm Chemistry',
+  'anatomy': 'Anatomy',
+  'social-pharmacy': 'Social Pharmacy'
+};
 
 function renderPaper() {
   const pool = getPaperQuestions();
-  document.getElementById('paper-count').textContent = pool.length;
-  const list = document.getElementById('paper-list');
 
-  list.innerHTML = pool.map((q, idx) => {
-    const badgeClass = `badge-${q.part}`;
-    const partLabel  = q.part === 'A' ? '5 marks' : q.part === 'B' ? '3 marks' : 'MCQ';
-    const yrLabel    = q.priority ? `${q.priority}yr` : '';
+  // Update count
+  const countEl = document.getElementById('paper-count-label');
+  if (countEl) countEl.textContent = `${pool.length} Questions`;
 
-    return `
-      <div class="paper-item" data-idx="${idx}">
-        <div class="paper-q" onclick="togglePaperItem(this)">
-          <div class="paper-meta">
-            <span class="paper-part-badge ${badgeClass}">${q.part}</span>
-            ${yrLabel ? `<span class="paper-yr">${yrLabel}</span>` : ''}
-          </div>
-          <div class="paper-q-text">${escapeHtml(q.q)}</div>
-          <svg class="paper-expand-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
-        </div>
-        <div class="paper-ans">
-          <div class="paper-ans-inner">
-            <div class="paper-subj-tag">${subjectLabel(q.subject)} · Part ${q.part} · ${partLabel}</div>
-            ${formatAnswer(q.a)}
-          </div>
-        </div>
-      </div>
-    `;
-  }).join('');
+  // Split by part
+  const grouped = { A: [], B: [], C: [] };
+  pool.forEach(q => {
+    const p = q.part || 'B';
+    if (!grouped[p]) grouped[p] = [];
+    grouped[p].push(q);
+  });
+
+  const hasAny = pool.length > 0;
+
+  ['A','B','C'].forEach(part => {
+    const section = document.getElementById(`paper-section-${part}`);
+    const list    = document.getElementById(`plist-${part}`);
+    const qs      = grouped[part] || [];
+
+    if (qs.length === 0 || !hasAny) {
+      section.classList.add('hidden');
+      return;
+    }
+
+    section.classList.remove('hidden');
+    list.innerHTML = qs.map((q, idx) => buildPaperItem(q, idx + 1, part)).join('');
+  });
+
+  const emptyEl = document.getElementById('paper-empty');
+  emptyEl.classList.toggle('hidden', hasAny);
+
+  // Add toggle listeners
+  document.querySelectorAll('.paper-q').forEach(el => {
+    el.addEventListener('click', () => {
+      el.closest('.paper-item').classList.toggle('open');
+    });
+  });
 }
 
-function togglePaperItem(el) {
-  const item = el.closest('.paper-item');
-  item.classList.toggle('open');
+function buildPaperItem(q, num, part) {
+  const freqClass = `freq-${q.priority || 1}`;
+  const freqLabel = q.priority ? `${q.priority}yr` : '';
+  const subjLabel = subjectNames[q.subject] || q.subject || '';
+
+  // Build answer section
+  let ansHtml = '';
+  if (part === 'C' && q.options && q.options.length) {
+    // MCQ — show options + highlight correct
+    const letters = ['A','B','C','D'];
+    const optsHtml = q.options.map((opt, i) => {
+      const isCorrect = i === q.correct;
+      return `<div class="paper-mcq-opt ${isCorrect ? 'correct-opt' : ''}">
+        <span class="pmo-letter">${letters[i]}.</span>
+        <span>${escapeHtml(opt)}</span>
+        ${isCorrect ? '<span style="margin-left:4px;font-size:11px;">✓</span>' : ''}
+      </div>`;
+    }).join('');
+    ansHtml = `
+      <div class="paper-ans-label">Options</div>
+      <div class="paper-mcq-options">${optsHtml}</div>
+      ${q.a ? `<div class="paper-ans-label" style="margin-top:10px;">Answer</div>
+      <div class="paper-ans-text">${formatAnswer(q.a)}</div>` : ''}
+    `;
+  } else {
+    ansHtml = `
+      <div class="paper-ans-label">Answer</div>
+      <div class="paper-ans-text">${formatAnswer(q.a)}</div>
+    `;
+  }
+
+  return `
+    <div class="paper-item">
+      <div class="paper-q">
+        <span class="paper-qnum">${num}.</span>
+        <div class="paper-q-body">
+          <div class="paper-q-text">${escapeHtml(q.q)}</div>
+          <div class="paper-q-meta">
+            ${freqLabel ? `<span class="paper-freq-badge ${freqClass}">${freqLabel}</span>` : ''}
+            <span class="paper-subj-tag">${subjLabel}</span>
+          </div>
+        </div>
+        <svg class="paper-expand-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+      </div>
+      <div class="paper-ans">
+        <div class="paper-ans-inner">
+          ${ansHtml}
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 function escapeHtml(s) {
@@ -623,13 +663,25 @@ function init() {
     if (Array.isArray(src)) ALL_QUESTIONS = ALL_QUESTIONS.concat(src);
   });
 
-  ALL_QUESTIONS.forEach((q, i) => {
-    if (!q.id) q.id = i;
-  });
+  ALL_QUESTIONS.forEach((q, i) => { if (!q.id) q.id = i; });
 
   // Update home stats
   const totalEl = document.getElementById('stat-total');
   if (totalEl) totalEl.textContent = ALL_QUESTIONS.length;
+
+  const mustEl = document.getElementById('stat-mustkno');
+  if (mustEl) mustEl.textContent = ALL_QUESTIONS.filter(q => q.priority === 4).length;
+
+  // Update subject counts
+  const subjects = ['all','pharmaceutics','pharmacognosy','pharm-chemistry','anatomy','social-pharmacy'];
+  subjects.forEach(s => {
+    const el = document.getElementById(`sc-${s}`);
+    if (!el) return;
+    const count = s === 'all'
+      ? ALL_QUESTIONS.length
+      : ALL_QUESTIONS.filter(q => q.subject === s).length;
+    el.textContent = `${count}q`;
+  });
 
   initTheme();
   showScreen('screen-home');
