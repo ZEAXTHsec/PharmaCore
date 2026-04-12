@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <title>PharmaCore — D.Pharma</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%234f8ef7'/><text x='50%' y='54%' dominant-baseline='middle' text-anchor='middle' font-size='36' font-family='serif' fill='white'>Rx</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
@@ -89,7 +90,7 @@
         <svg class="hnav-arr" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
       </button>
 
-      <button class="hnav-card hnav-dim" id="btn-notes">
+      <button class="hnav-card hnav-purple" id="btn-notes">
         <div class="hnav-icon">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
         </div>
@@ -97,7 +98,7 @@
           <strong>Notes Library</strong>
           <span>Chapter-wise deep reading</span>
         </div>
-        <span class="soon-badge">Soon</span>
+        <svg class="hnav-arr" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
       </button>
     </div>
 
@@ -381,13 +382,24 @@
 
   <!-- NOTES -->
   <section id="screen-notes" class="screen">
-    <div class="coming-soon-box">
-      <div class="cs-glyph">📚</div>
-      <h2>Notes Library</h2>
-      <p>Chapter-wise notes are being added. Check back soon.</p>
-      <button id="btn-notes-back" class="btn-primary">Go to Exam Engine</button>
+    <div class="notes-top">
+      <h2 class="notes-screen-title">Notes Library</h2>
+      <p class="notes-screen-sub">Chapter-wise Pharmacognosy notes · ER20 Syllabus</p>
+    </div>
+    <div class="notes-chapter-list" id="notes-chapter-list">
+      <!-- populated by JS -->
+    </div>
+    <div id="notes-chapter-view" class="hidden">
+      <div class="notes-chap-header" id="notes-chap-header"></div>
+      <div class="notes-chap-body" id="notes-chap-body"></div>
     </div>
   </section>
+
+  <footer class="app-footer">
+    <span>Made with ❤️ by <strong>Aftab M.</strong></span>
+    <span class="footer-dot">·</span>
+    <span>PharmaCore · D.Pharma ER20</span>
+  </footer>
 
   <script src="data/pharmaceutics.js"></script>
   <script src="data/pharmacognosy.js"></script>
@@ -395,6 +407,7 @@
   <script src="data/anatomy.js"></script>
   <script src="data/social-pharmacy.js"></script>
   <script src="data/lastday.js"></script>
+  <script src="data/notes.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
