@@ -382,23 +382,82 @@
 
   <!-- NOTES -->
   <section id="screen-notes" class="screen">
-    <div class="notes-top">
-      <h2 class="notes-screen-title">Notes Library</h2>
-      <p class="notes-screen-sub">Chapter-wise Pharmacognosy notes · ER20 Syllabus</p>
+
+    <!-- LEVEL: year selection -->
+    <div id="notes-view-years">
+      <div class="notes-hero">
+        <div class="notes-hero-badge">📚 D.Pharma · ER20 Syllabus</div>
+        <h2 class="notes-hero-title">Notes Library</h2>
+        <p class="notes-hero-sub">Chapter-wise notes for board exam preparation</p>
+      </div>
+      <div class="notes-year-grid">
+        <button class="notes-year-card active-year" id="notes-year-1">
+          <div class="nyc-badge nyc-live">LIVE</div>
+          <div class="nyc-icon">🎓</div>
+          <div class="nyc-title">1st Year</div>
+          <div class="nyc-sub">4 subjects · Pharmacognosy live</div>
+          <svg class="nyc-arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
+        <button class="notes-year-card notes-year-locked" id="notes-year-2">
+          <div class="nyc-badge nyc-soon">SOON</div>
+          <div class="nyc-icon">🔒</div>
+          <div class="nyc-title">2nd Year</div>
+          <div class="nyc-sub">Content dropping soon</div>
+        </button>
+      </div>
     </div>
-    <div class="notes-chapter-list" id="notes-chapter-list">
-      <!-- populated by JS -->
+
+    <!-- LEVEL: subject selection (within a year) -->
+    <div id="notes-view-subjects" class="hidden">
+      <div class="notes-breadcrumb" id="notes-bc-year"></div>
+      <div class="notes-subject-grid" id="notes-subject-grid">
+        <!-- populated by JS -->
+      </div>
     </div>
-    <div id="notes-chapter-view" class="hidden">
-      <div class="notes-chap-header" id="notes-chap-header"></div>
+
+    <!-- LEVEL: chapter list (within a subject) -->
+    <div id="notes-view-chapters" class="hidden">
+      <div class="notes-breadcrumb" id="notes-bc-subject"></div>
+      <div class="notes-chapter-list" id="notes-chapter-list"></div>
+    </div>
+
+    <!-- LEVEL: chapter detail -->
+    <div id="notes-view-detail" class="hidden">
+      <div class="notes-breadcrumb" id="notes-bc-chapter"></div>
+      <div id="notes-chap-header"></div>
       <div class="notes-chap-body" id="notes-chap-body"></div>
     </div>
+
   </section>
 
+  <!-- CREDITS SCREEN (accessible from footer) -->
+  <div id="credits-overlay" class="credits-overlay hidden">
+    <div class="credits-card">
+      <button class="credits-close" id="credits-close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div class="credits-avatar">AM</div>
+      <div class="credits-name">Aftab M.</div>
+      <div class="credits-role">D.Pharma Student · App Creator</div>
+      <div class="credits-divider"></div>
+      <div class="credits-about">Built PharmaCore to help fellow D.Pharma students crack board exams with pattern-based revision, real question papers &amp; last-day guides.</div>
+      <div class="credits-tags">
+        <span class="credits-tag">📱 Vanilla JS</span>
+        <span class="credits-tag">🎨 Mobile-first</span>
+        <span class="credits-tag">📚 ER20 Syllabus</span>
+        <span class="credits-tag">🇮🇳 D.Pharma</span>
+      </div>
+      <div class="credits-footer-note">PharmaCore v2 · D.Pharma ER20</div>
+    </div>
+  </div>
+
   <footer class="app-footer">
-    <span>Made with ❤️ by <strong>Aftab M.</strong></span>
+    <button class="footer-credit-btn" id="footer-credit-btn">
+      <span class="footer-avatar-mini">AM</span>
+      <span>Made by <strong>Aftab M.</strong></span>
+    </button>
     <span class="footer-dot">·</span>
-    <span>PharmaCore · D.Pharma ER20</span>
+    <span class="footer-brand">PharmaCore</span>
   </footer>
 
   <script src="data/pharmaceutics.js"></script>
