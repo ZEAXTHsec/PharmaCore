@@ -107,7 +107,22 @@ document.getElementById('back-btn').addEventListener('click', () => {
   } else if (active === 'screen-lastday') {
     showScreen('screen-home');
   } else if (active === 'screen-notes') {
-    showScreen('screen-home');
+    // Handle notes sub-navigation
+    const detailVisible = !document.getElementById('notes-view-detail').classList.contains('hidden');
+    const chaptersVisible = !document.getElementById('notes-view-chapters').classList.contains('hidden');
+    const subjectsVisible = !document.getElementById('notes-view-subjects').classList.contains('hidden');
+
+    if (detailVisible) {
+      renderNotesChapters(notesNav.subjectId);
+      showNotesView('chapters');
+    } else if (chaptersVisible) {
+      renderNotesSubjects(notesNav.year);
+      showNotesView('subjects');
+    } else if (subjectsVisible) {
+      showNotesView('years');
+    } else {
+      showScreen('screen-home');
+    }
   } else {
     showScreen('screen-home');
   }
@@ -138,68 +153,138 @@ document.getElementById('btn-notes').addEventListener('click', () => {
 });
 
 /* =====================
-   NOTES LIBRARY
+   NOTES LIBRARY v2 — Year → Subject → Chapter → Topic
    ===================== */
-let notesState = {
-  view: 'list',      // 'list' | 'chapter'
+
+const notesNav = {
+  year: null,       // '1' | '2'
+  subjectId: null,
   chapterId: null,
 };
 
+/* 1st Year subjects config */
+const notesSubjects = {
+  '1': [
+    { id: 'pharmacognosy',   icon: '🌿', name: 'Pharmacognosy',           status: 'live',  meta: '8 chapters · ER20' },
+    { id: 'pharmaceutics',   icon: '💊', name: 'Pharmaceutics',           status: 'soon',  meta: 'Coming soon' },
+    { id: 'pharm-chemistry', icon: '🧪', name: 'Pharmaceutical Chemistry', status: 'soon', meta: 'Coming soon' },
+    { id: 'anatomy',         icon: '🫀', name: 'Human Anatomy & Physiology', status: 'soon', meta: 'Coming soon' },
+  ],
+  '2': []
+};
+
 function initNotesLibrary() {
-  notesState.view = 'list';
-  renderNotesList();
-  document.getElementById('notes-chapter-view').classList.add('hidden');
-  document.getElementById('notes-chapter-list').classList.remove('hidden');
+  notesNav.year = null;
+  notesNav.subjectId = null;
+  notesNav.chapterId = null;
+  showNotesView('years');
 }
 
-function renderNotesList() {
-  if (!window.notesData) return;
-  const el = document.getElementById('notes-chapter-list');
-  el.innerHTML = window.notesData.map(ch => `
+function showNotesView(view) {
+  ['years','subjects','chapters','detail'].forEach(v => {
+    const el = document.getElementById(`notes-view-${v}`);
+    if (el) el.classList.toggle('hidden', v !== view);
+  });
+  window.scrollTo(0, 0);
+}
+
+/* YEAR click */
+document.getElementById('notes-year-1').addEventListener('click', () => {
+  notesNav.year = '1';
+  renderNotesSubjects('1');
+  showNotesView('subjects');
+});
+
+function renderNotesSubjects(year) {
+  const subjects = notesSubjects[year] || [];
+  const yearLabel = year === '1' ? '1st Year' : '2nd Year';
+
+  document.getElementById('notes-bc-year').innerHTML = buildBreadcrumb([
+    { label: 'Notes', action: () => { showNotesView('years'); } },
+    { label: yearLabel, current: true }
+  ]);
+
+  const grid = document.getElementById('notes-subject-grid');
+  grid.innerHTML = subjects.map(s => `
+    <div class="notes-subj-card nsc-${s.status}" data-subj="${s.id}">
+      <div class="nsc-icon">${s.icon}</div>
+      <div class="nsc-info">
+        <div class="nsc-name">${s.name}</div>
+        <div class="nsc-meta">${s.meta}</div>
+      </div>
+      <span class="nsc-status nsc-status-${s.status}">${s.status === 'live' ? 'LIVE' : 'SOON'}</span>
+      ${s.status === 'live' ? `<svg class="nsc-arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>` : ''}
+    </div>
+  `).join('');
+
+  grid.querySelectorAll('.notes-subj-card.nsc-live').forEach(card => {
+    card.addEventListener('click', () => {
+      notesNav.subjectId = card.dataset.subj;
+      renderNotesChapters(notesNav.subjectId);
+      showNotesView('chapters');
+    });
+  });
+}
+
+function renderNotesChapters(subjectId) {
+  const yearLabel = notesNav.year === '1' ? '1st Year' : '2nd Year';
+  const subj = notesSubjects[notesNav.year].find(s => s.id === subjectId);
+  const chapters = (window.notesData || []).filter(ch => (ch.subject || 'pharmacognosy') === subjectId);
+
+  document.getElementById('notes-bc-subject').innerHTML = buildBreadcrumb([
+    { label: 'Notes', action: () => { showNotesView('years'); } },
+    { label: yearLabel, action: () => { renderNotesSubjects(notesNav.year); showNotesView('subjects'); } },
+    { label: subj ? subj.name : subjectId, current: true }
+  ]);
+
+  const list = document.getElementById('notes-chapter-list');
+  list.innerHTML = chapters.map(ch => `
     <div class="notes-chapter-card" data-id="${ch.id}" style="--ch-color:${ch.color}">
       <div class="ncc-left">
         <div class="ncc-icon" style="background:${ch.color}20;color:${ch.color}">${ch.emoji}</div>
         <div class="ncc-info">
           <div class="ncc-num">Chapter ${ch.chapter}</div>
           <div class="ncc-title">${ch.title}</div>
-          <div class="ncc-meta">${ch.units.length} unit${ch.units.length > 1 ? 's' : ''}</div>
+          <div class="ncc-meta">${ch.units.length} unit${ch.units.length !== 1 ? 's' : ''}</div>
         </div>
       </div>
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${ch.color}" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
     </div>
   `).join('');
 
-  el.querySelectorAll('.notes-chapter-card').forEach(card => {
+  list.querySelectorAll('.notes-chapter-card').forEach(card => {
     card.addEventListener('click', () => {
-      notesState.chapterId = card.dataset.id;
+      notesNav.chapterId = card.dataset.id;
       openNotesChapter(card.dataset.id);
+      showNotesView('detail');
     });
   });
 }
 
 function openNotesChapter(id) {
-  const ch = window.notesData.find(c => c.id === id);
+  const ch = (window.notesData || []).find(c => c.id === id);
   if (!ch) return;
 
-  document.getElementById('notes-chapter-list').classList.add('hidden');
-  document.getElementById('notes-chapter-view').classList.remove('hidden');
+  const yearLabel = notesNav.year === '1' ? '1st Year' : '2nd Year';
+  const subj = notesSubjects[notesNav.year].find(s => s.id === (ch.subject || 'pharmacognosy'));
 
-  // Header
+  document.getElementById('notes-bc-chapter').innerHTML = buildBreadcrumb([
+    { label: 'Notes', action: () => { showNotesView('years'); } },
+    { label: yearLabel, action: () => { renderNotesSubjects(notesNav.year); showNotesView('subjects'); } },
+    { label: subj ? subj.name : '', action: () => { renderNotesChapters(notesNav.subjectId); showNotesView('chapters'); } },
+    { label: `Ch ${ch.chapter}`, current: true }
+  ]);
+
   document.getElementById('notes-chap-header').innerHTML = `
-    <button class="notes-back-btn" id="notes-back-btn">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-      All Chapters
-    </button>
     <div class="nch-hero" style="--ch-color:${ch.color}">
       <div class="nch-emoji">${ch.emoji}</div>
       <div class="nch-text">
-        <div class="nch-chnum">Chapter ${ch.chapter}</div>
+        <div class="nch-chnum">Chapter ${ch.chapter} · ${subj ? subj.name : 'Pharmacognosy'}</div>
         <div class="nch-title">${ch.title}</div>
       </div>
     </div>
   `;
 
-  // Body — units and topics
   document.getElementById('notes-chap-body').innerHTML = ch.units.map(unit => `
     <div class="notes-unit">
       <div class="notes-unit-title">${unit.title}</div>
@@ -216,20 +301,33 @@ function openNotesChapter(id) {
       `).join('')}
     </div>
   `).join('');
-
-  // Back button inside chapter view
-  document.getElementById('notes-back-btn').addEventListener('click', () => {
-    document.getElementById('notes-chapter-view').classList.add('hidden');
-    document.getElementById('notes-chapter-list').classList.remove('hidden');
-    window.scrollTo(0, 0);
-  });
-
-  window.scrollTo(0, 0);
 }
 
 function toggleNotesTopic(headerEl) {
   headerEl.closest('.notes-topic-card').classList.toggle('open');
 }
+
+function buildBreadcrumb(items) {
+  return items.map((item, i) => {
+    const isLast = i === items.length - 1;
+    const sep = i > 0 ? `<span class="nbc-sep">›</span>` : '';
+    if (item.current || isLast) {
+      return `${sep}<span class="nbc-item"><span class="nbc-current">${item.label}</span></span>`;
+    }
+    return `${sep}<span class="nbc-item"><button onclick="(${item.action.toString()})()">${item.label}</button></span>`;
+  }).join('');
+}
+
+/* Credits overlay */
+document.getElementById('footer-credit-btn').addEventListener('click', () => {
+  document.getElementById('credits-overlay').classList.remove('hidden');
+});
+document.getElementById('credits-close').addEventListener('click', () => {
+  document.getElementById('credits-overlay').classList.add('hidden');
+});
+document.getElementById('credits-overlay').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) document.getElementById('credits-overlay').classList.add('hidden');
+});
 
 // Nav brand = go home
 document.getElementById('nav-brand').addEventListener('click', () => {
