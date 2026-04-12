@@ -106,6 +106,8 @@ document.getElementById('back-btn').addEventListener('click', () => {
     showScreen('screen-home');
   } else if (active === 'screen-lastday') {
     showScreen('screen-home');
+  } else if (active === 'screen-notes') {
+    showScreen('screen-home');
   } else {
     showScreen('screen-home');
   }
@@ -132,11 +134,102 @@ document.getElementById('btn-lastday').addEventListener('click', () => {
 
 document.getElementById('btn-notes').addEventListener('click', () => {
   showScreen('screen-notes');
+  initNotesLibrary();
 });
 
-document.getElementById('btn-notes-back').addEventListener('click', () => {
-  showScreen('screen-engine');
-});
+/* =====================
+   NOTES LIBRARY
+   ===================== */
+let notesState = {
+  view: 'list',      // 'list' | 'chapter'
+  chapterId: null,
+};
+
+function initNotesLibrary() {
+  notesState.view = 'list';
+  renderNotesList();
+  document.getElementById('notes-chapter-view').classList.add('hidden');
+  document.getElementById('notes-chapter-list').classList.remove('hidden');
+}
+
+function renderNotesList() {
+  if (!window.notesData) return;
+  const el = document.getElementById('notes-chapter-list');
+  el.innerHTML = window.notesData.map(ch => `
+    <div class="notes-chapter-card" data-id="${ch.id}" style="--ch-color:${ch.color}">
+      <div class="ncc-left">
+        <div class="ncc-icon" style="background:${ch.color}20;color:${ch.color}">${ch.emoji}</div>
+        <div class="ncc-info">
+          <div class="ncc-num">Chapter ${ch.chapter}</div>
+          <div class="ncc-title">${ch.title}</div>
+          <div class="ncc-meta">${ch.units.length} unit${ch.units.length > 1 ? 's' : ''}</div>
+        </div>
+      </div>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${ch.color}" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+    </div>
+  `).join('');
+
+  el.querySelectorAll('.notes-chapter-card').forEach(card => {
+    card.addEventListener('click', () => {
+      notesState.chapterId = card.dataset.id;
+      openNotesChapter(card.dataset.id);
+    });
+  });
+}
+
+function openNotesChapter(id) {
+  const ch = window.notesData.find(c => c.id === id);
+  if (!ch) return;
+
+  document.getElementById('notes-chapter-list').classList.add('hidden');
+  document.getElementById('notes-chapter-view').classList.remove('hidden');
+
+  // Header
+  document.getElementById('notes-chap-header').innerHTML = `
+    <button class="notes-back-btn" id="notes-back-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      All Chapters
+    </button>
+    <div class="nch-hero" style="--ch-color:${ch.color}">
+      <div class="nch-emoji">${ch.emoji}</div>
+      <div class="nch-text">
+        <div class="nch-chnum">Chapter ${ch.chapter}</div>
+        <div class="nch-title">${ch.title}</div>
+      </div>
+    </div>
+  `;
+
+  // Body — units and topics
+  document.getElementById('notes-chap-body').innerHTML = ch.units.map(unit => `
+    <div class="notes-unit">
+      <div class="notes-unit-title">${unit.title}</div>
+      ${unit.topics.map(topic => `
+        <div class="notes-topic-card">
+          <div class="notes-topic-header" onclick="toggleNotesTopic(this)">
+            <span class="notes-topic-heading">${topic.heading}</span>
+            <svg class="ntc-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+          </div>
+          <div class="notes-topic-body">
+            <div class="notes-topic-content">${topic.content}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+
+  // Back button inside chapter view
+  document.getElementById('notes-back-btn').addEventListener('click', () => {
+    document.getElementById('notes-chapter-view').classList.add('hidden');
+    document.getElementById('notes-chapter-list').classList.remove('hidden');
+    window.scrollTo(0, 0);
+  });
+
+  window.scrollTo(0, 0);
+}
+
+function toggleNotesTopic(headerEl) {
+  headerEl.closest('.notes-topic-card').classList.toggle('open');
+}
 
 // Nav brand = go home
 document.getElementById('nav-brand').addEventListener('click', () => {
