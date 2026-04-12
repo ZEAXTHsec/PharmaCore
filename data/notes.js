@@ -11,6 +11,7 @@ window.notesData = [
   // ─────────────────────────────────────────
   {
     id: 'ch1',
+    subject: 'pharmacognosy',
     chapter: 1,
     title: 'Definition, History, Present Status & Scope',
     emoji: '📖',
@@ -90,6 +91,7 @@ The subject covers crude drugs from <b>plant, animal and mineral</b> origins.`
   // ─────────────────────────────────────────
   {
     id: 'ch2',
+    subject: 'pharmacognosy',
     chapter: 2,
     title: 'Classification of Drugs',
     emoji: '🗂️',
@@ -201,6 +203,7 @@ The subject covers crude drugs from <b>plant, animal and mineral</b> origins.`
   // ─────────────────────────────────────────
   {
     id: 'ch3',
+    subject: 'pharmacognosy',
     chapter: 3,
     title: 'Quality Control of Crude Drugs',
     emoji: '🔬',
@@ -270,6 +273,7 @@ Detailed examination using microscope; histological studies from thin drug secti
   // ─────────────────────────────────────────
   {
     id: 'ch4',
+    subject: 'pharmacognosy',
     chapter: 4,
     title: 'Alkaloids, Glycosides, Volatile Oils, Tannins & Resins',
     emoji: '⚗️',
@@ -493,6 +497,7 @@ Drug + FeCl₃ in glacial acetic acid + H₂SO₄ → <span style="color:#3498db
   // ─────────────────────────────────────────
   {
     id: 'ch5',
+    subject: 'pharmacognosy',
     chapter: 5,
     title: 'Drugs Classified by Pharmacological Action',
     emoji: '💊',
@@ -905,6 +910,7 @@ Drug + FeCl₃ in glacial acetic acid + H₂SO₄ → <span style="color:#3498db
   // ─────────────────────────────────────────
   {
     id: 'ch6',
+    subject: 'pharmacognosy',
     chapter: 6,
     title: 'Plant Fibres & Surgical Dressings',
     emoji: '🩹',
@@ -1040,6 +1046,7 @@ Stainless steel ligatures — used for tooth aligning and levelling.`
   // ─────────────────────────────────────────
   {
     id: 'ch7',
+    subject: 'pharmacognosy',
     chapter: 7,
     title: 'Traditional Systems of Medicine & Ayurvedic Formulations',
     emoji: '🌿',
@@ -1206,6 +1213,7 @@ Sugar/jaggery dissolved in liquid → Boiled & Filtered → Powdered drugs/extra
   // ─────────────────────────────────────────
   {
     id: 'ch8',
+    subject: 'pharmacognosy',
     chapter: 8,
     title: 'Medicinal Plants: National Economy & Export Potential',
     emoji: '🌏',
